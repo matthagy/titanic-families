@@ -1,3 +1,6 @@
+'''Provides a single and clean interface to testing and training
+data in competition.
+'''
 
 from __future__ import division
 

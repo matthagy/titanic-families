@@ -1,3 +1,5 @@
+'''Graph data structures and utilities for graph construction
+'''
 
 import operator
 
