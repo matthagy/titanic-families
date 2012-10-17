@@ -24,8 +24,8 @@ individual cannot be siblings if one of them has sibsp==0).
 Next we prove spousal relationship. This fairly easy, epically
 as many spouses name pairs are of the form:
 
-   West, Mrs. Edwy Arthur (Ada Mary Worth)
-   West, Mr. Edwy Arthur
+    West, Mrs. Edwy Arthur (Ada Mary Worth)
+    West, Mr. Edwy Arthur
 
 We don't require names of this style and can also use age differences,
 requires Mrs title for the female, and other simple heuristics.
