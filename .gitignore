@@ -1,0 +1,19 @@
+# Various editor backup files
+\#*\#
+.\#*
+.*~
+
+# Cached python compiled filed
+*.pyc
+*.pyo
+__pycache__
+*.egg-info
+
+# Compliation results
+*.so
+*.dylib
+*.o
+
+# Build results
+build/
+
