@@ -11,10 +11,10 @@ First a graph of individuals is constructed where the edges represent
 shared last names. This includes any previous names such maiden names.
 Each edge represents as relationship that can be classified as one
 of the following:
-   o Spouse
-   o Parent/Child
-   o Sibling
-   o Extended (e.g. aunt, cousin, or distant relative)
+   * Spouse
+   * Parent/Child
+   * Sibling
+   * Extended (e.g. aunt, cousin, or distant relative)
 
 The classification scheme is optimistic, i.e. we only ask
 whether or not the relationship is possible. Much of information
@@ -44,9 +44,9 @@ children.
 
 Outside of the nuclear family structure, we still maintain the
 relationship graph which allows for such classifications as:
-  o siblings traveling together without any parents
-  o extended relations
-  o families joined by extended relationships
+  * siblings traveling together without any parents
+  * extended relations
+  * families joined by extended relationships
 
 At the moment there are still some edge cases. In particular, the largest
 relationship graph component isn't separated into a family structure.
