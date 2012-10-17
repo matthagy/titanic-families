@@ -67,7 +67,7 @@ MINIMUM_AGE_FOR_MARRIAGE = 14
 # At most, a married woman can be n years older than husband
 # This rule might not be needed
 LARGEST_MARRIED_FEMALE_AGE_ADVANTAGE = 10
-# A parent must be atleast n years older than their child
+# A parent must be at least n years older than their child
 MINIMUM_PARENT_AGE_ADVANTAGE = 14
 
 
@@ -75,7 +75,7 @@ MINIMUM_PARENT_AGE_ADVANTAGE = 14
 #--------------------------------------------------------
 
 class DotIDMixin(object):
-    '''Base class for nodes that are writen to dot files
+    '''Base class for nodes that are written to dot files
     '''
 
     dot_id_counter = 0
@@ -164,7 +164,7 @@ class Person(DotIDMixin, graphlib.Node):
         return len(self.siblings)
 
     @property
-    def n_kownn_extended(self):
+    def n_known_extended(self):
         return len(self.extended)
 
     def __str__(self):
@@ -219,10 +219,10 @@ class RelationEdge(graphlib.Edge):
         super(RelationEdge, self).__init__(a, b)
         self.a = a
         self.b = b
-        self.set_all_possbilities(True)
+        self.set_all_possibilities(True)
 
-    def set_all_possbilities(self, value):
-        value = bool(value
+    def set_all_possibilities(self, value):
+        value = bool(value)
         self.could_be_spouse = value
         self.could_be_sibling = value
         self.could_be_child = value
@@ -273,12 +273,12 @@ class LastNameBuilder(graphlib.GraphBuilder):
 
     def __init__(self):
         super(LastNameBuilder, self).__init__(node_factory=CommonLastName,
-                                          edge_factory=LastNameEdge)
+                                              edge_factory=LastNameEdge)
 
     def add_edge(self, name, person):
         self.values_to_nodes[person] = person
         super(LastNameBuilder, self).add_edge(self.get_node(name),
-                                          person)
+                                              person)
 
 class NuclearFamily(DotIDMixin):
 
@@ -293,8 +293,8 @@ class NuclearFamily(DotIDMixin):
         # add more validation
 
 
-def construct_familiy_components(train=TitanicDataSet.get_train(),
-                                 test=TitanicDataSet.get_test()):
+def construct_family_components(train=TitanicDataSet.get_train(),
+                                test=TitanicDataSet.get_test()):
     lnb = LastNameBuilder()
     add_last_names(lnb, train)
     add_last_names(lnb, test)
@@ -310,8 +310,8 @@ def add_last_names(nb, ds):
         survived = ds.survived
     else:
         survived = [None] * len(ds)
-    for attributes,survivied in zip(survivied, ds.iter_entries()):
-        person = Person(attributes, survivied)
+    for attributes,survived in zip(survived, ds.iter_entries()):
+        person = Person(attributes, survived)
         for last_name in person.parsed_name.iter_last_names():
             nb.add_edge(last_name, person)
 
@@ -373,7 +373,7 @@ def build_family(seen, n):
     return f
 
 def tune_family_relations(c):
-    # Use simple hueristics to determine relationship individuals.
+    # Use simple heuristics to determine relationship individuals.
     # Throughout this procedure we incrementally prove various relationships
     # exists.
     update_relationship_possibilities(c)
@@ -433,7 +433,7 @@ def could_be_sibling(a, b):
     elif a.spouse or b.spouse:
         return False
 
-    # check if sibsp or sex rules out possibility of them being spoues
+    # check if sibsp or sex rules out possibility of them being spouse
     if a.adjusted_sibsp == 0 or b.adjusted_sibsp == 0:
         return False
     if a.a.sex == b.a.sex:
@@ -452,7 +452,7 @@ def could_be_sibling(a, b):
     if 'master' in titles or 'miss' in titles:
         return False
 
-    # check if the womens main name includes a significant portion of
+    # check if the woman's main name includes a significant portion of
     # the mans name. (e.g Mrs. Sammuel Herman and Mr. Sammuel Herman)
     m,f = (a,b) if a.a.sex == 0 else (b,a)
     if m.parsed_name.main == f.parsed_name.main:
@@ -466,10 +466,10 @@ def could_be_sibling(a, b):
             ambiguous_gt(b.age, MINIMUM_AGE_FOR_MARRIAGE)):
         return False
 
-    # Tf we know both ages, rule out women who are 5+ years older than men
+    # If we know both ages, rule out women who are 5+ years older than men
     # this might be an invalid rule as some of entries look like older rich
-    # women married to young men. The cases i've observed are already handled
-    # by the earlier check if the womens main name includes the main.
+    # women married to young men. The cases I've observed are already handled
+    # by the earlier check if the woman's main name includes the main.
     # This rule was added to help sort out the mother/son vs. mother/husband,
     # but it may be better to leave those cases ambiguous anyways.
     if a.age != b.age != -1:
@@ -502,7 +502,7 @@ def could_be_child(parent, child):
     return True
 
 def score_sibling(a, b):
-    # Already proben that they are siblings
+    # Already proven that they are siblings
     if a in b.siblings:
         assert b in a.siblings
         return True
@@ -528,8 +528,8 @@ def prove_spouses(c):
     # In practice it is fairly easy to prove spouse relationship.
     # We only run into problems where one partner could be classified
     # into multiple marriages due to optimistic spouse rule.
-    # Here we deal with these ambiguous cases by preferring situtations
-    # where the females name includes the male name. In pratice this
+    # Here we deal with these ambiguous cases by preferring situations
+    # where the females name includes the male name. In practice this
     # seems to easily give us definitive spouse relationships.
 
     # Find sets of individual joined by the possibility of marriage
@@ -578,7 +578,7 @@ def make_spouse(m, f):
     e = m.get_edge_to(f)
     assert e.could_be_spouse
     assert not e.definitive_spouse
-    e.set_all_possbilities(False)
+    e.set_all_possibilities(False)
     e.could_be_spouse = True
     m.spouse = f
     f.spouse = m
@@ -652,13 +652,13 @@ def prove_parents_children(parents):
         c.father = father
         if mother:
             e = c.get_edge_to(mother)
-            e.set_all_possbilities(False)
+            e.set_all_possibilities(False)
             e.could_be_child = True
             e.a = mother
             e.b = c
         if father:
             e = c.get_edge_to(father)
-            e.set_all_possbilities(False)
+            e.set_all_possibilities(False)
             e.could_be_child = True
             e.a = father
             e.b = c
@@ -676,7 +676,7 @@ def prove_parents_children(parents):
 #                 continue
 #             e = c.get_edge_to(other)
 #             assert e.could_be_sibling
-#             e.set_all_possbilities(False)
+#             e.set_all_possibilities(False)
 #             e.could_be_sibling = True
 #         c.siblings = tuple(other_children)
 
@@ -719,8 +719,8 @@ def share_name(a, b):
                for bn in b.parsed_name.iter_last_names())
 
 def general_affinity(a, b):
-    return (ambiguous_equal(a.embarked, b.embarked) and
-            ambiguous_equal(a.pclass, b.pclass))
+    return (ambiguous_equal(a.a.embarked, b.a.embarked) and
+            ambiguous_equal(a.a.pclass, b.a.pclass))
 
 def ambiguous_equal(a, b):
     return a == b or a < 0 or b < 0
@@ -792,7 +792,7 @@ def display_graph(path, components, show_extra=True):
                 )
 
 def write_dot(path, cs, show_extra):
-    # need to save references to famiies so that they don't disappear
+    # need to save references to families so that they don't disappear
     all_families = []
     with open(path, 'w') as fp:
 #        print >>fp, 'rankdir=LR;'
@@ -872,3 +872,4 @@ def make_extra_edge(e):
         label = ' '.join('%s=%.1f' % (l,w) for l,w in zip(labels[mask], weights[mask]))
 
     return 'label="%s" penwidth=%d style="%s"' % (label, penwidth, style)
+

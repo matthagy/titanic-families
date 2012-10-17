@@ -1,3 +1,5 @@
+'''Graph data structures and utilities for graph construction
+'''
 
 import operator
 
@@ -165,3 +167,4 @@ class GraphBuilder(object):
         for node in component.nodes:
             self.nodes_to_components[node] = component
         return component, e
+

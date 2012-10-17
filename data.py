@@ -1,3 +1,5 @@
+'''Provides a convenient interface to the training and testing data
+'''
 
 from __future__ import division
 
