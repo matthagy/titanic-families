@@ -10,8 +10,7 @@ from collections import namedtuple
 
 import numpy as np
 
-csv_dir = os.path.join(os.path.split(__file__),
-                       'data/csv')
+csv_dir = os.path.join(os.path.dirname(__file__), 'data/csv')
 train_path = os.path.join(csv_dir, 'train.csv')
 test_path = os.path.join(csv_dir, 'test.csv')
 

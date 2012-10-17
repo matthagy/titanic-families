@@ -17,3 +17,5 @@ __pycache__
 # Build results
 build/
 
+# Output of display_families
+families_graphs/
