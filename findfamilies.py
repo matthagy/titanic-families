@@ -68,7 +68,6 @@ __all__ = ['construct_family_components',
 
 # Parameters
 #--------------------------------------------------------
-
 # No on under this age can be consider married
 MINIMUM_AGE_FOR_MARRIAGE = 14
 
