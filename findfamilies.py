@@ -80,7 +80,7 @@ MINIMUM_AGE_FOR_MARRIAGE = 14
 MINIMUM_PARENT_AGE_ADVANTAGE = 14
 
 # # For two family graphs, there is an extra child-like individual
-# # (possibly a neice or nephew or just distant relative) that can't
+# # (possibly a niece or nephew or just distant relative) that can't
 # # be discerned from the true children. With this set we classify them
 # # as a child.
 # ALLOW_ADDITIONAL_CHILDREN = True
@@ -326,7 +326,7 @@ def construct_family_components(train=TitanicDataSet.get_train(),
     '''Entry point for finding relationships.
 
     Returns a list of graph components (graphlib.Component)
-    where the nodes are indivuduals (Person) and edges are
+    where the nodes are individuals (Person) and edges are
     relationships (RelationEdge).
     '''
     lnb = LastNameBuilder()
@@ -350,7 +350,7 @@ def add_last_names(nb, ds):
             nb.add_edge(last_name, person)
 
 def build_relations(c):
-    # Extract people nodes, disgarding LastNameNodes, and
+    # Extract people nodes, discarding LastNameNodes, and
     # clear all of the LastNameEdges
     nodes, edges = c.tear_down()
     people = [n for n in nodes if isinstance(n, Person)]
@@ -358,7 +358,7 @@ def build_relations(c):
         del p.edges[::]
 
     # Group together all of the people who share a last name
-    # and meet general affinitiy qualifications
+    # and meet general affinity qualifications
     gb = graphlib.GraphBuilder(edge_factory=RelationEdge)
     for p in people:
         gb.values_to_nodes[p] = p
@@ -369,7 +369,7 @@ def build_relations(c):
     return gb.get_graph().components
 
 def find_nuclear_families(c):
-    '''Finds the nuclear familes in a graph component.
+    '''Finds the nuclear families in a graph component.
 
     Also returns any nodes and edges that are not included
     in families.
