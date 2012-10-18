@@ -398,13 +398,13 @@ def find_nuclear_families(c):
 
 def build_family(seen, n):
     f = NuclearFamily(name=n.parsed_name.last)
-    if n.sex == 0:
+    if n.a.sex == 0:
         f.father = n
     else:
         f.mother = n
     seen.add(n)
     if n.spouse:
-        if n.spouse.sex == 0:
+        if n.spouse.a.sex == 0:
             f.father = n.spouse
         else:
             f.mother = n.spouse
