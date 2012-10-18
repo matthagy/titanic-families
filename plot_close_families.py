@@ -2,8 +2,6 @@
 and how this impacted survivial.
 '''
 
-import os
-import os.path
 from collections import defaultdict
 
 import matplotlib.pyplot as plt
@@ -11,7 +9,6 @@ from matplotlib.collections import LineCollection
 import numpy as np
 
 from data import TitanicDataSet
-import findfamilies; reload(findfamilies)
 from findfamilies import construct_family_components, find_nuclear_families
 
 def main():
@@ -85,6 +82,8 @@ def plot_class(fignum, name, pclass, y_max):
 
 
 class MockPerson(object):
+    '''Used in testing placement algorithm
+    '''
 
     class Attributes(object):
         def __init__(self, sex):
@@ -93,6 +92,7 @@ class MockPerson(object):
     def __init__(self, sex, survived):
         self.a = self.Attributes(sex)
         self.survived = survived
+
 
 class BaseFrame(object):
 
@@ -175,7 +175,6 @@ class CoupleFrame(BaseFrame):
 
     def create_frame(self):
         self.create_2people(0, [self.wife, self.husband])
-        self.create_hline(0, -0.5*self.person_spacing, 0.5*self.person_spacing)
 
 
 class FamilyFrame(BaseFrame):
@@ -248,7 +247,7 @@ class FramePlacer(object):
         frames = list(frames)
         while frames:
             for frame in frames:
-                if self.can_place_frame(frame):
+                if self.can_place_frame_on_current_row(frame):
                     break
             else:
                 frame = frames[0]
@@ -256,7 +255,7 @@ class FramePlacer(object):
             self.add_frame(frame)
         self.fixup_rows()
 
-    def can_place_frame(self, frame):
+    def can_place_frame_on_current_row(self, frame):
         return frame.width + self.x_offset <= self.max_width
 
     def fixup_rows(self):
@@ -265,10 +264,12 @@ class FramePlacer(object):
         if self.row:
             self.fixup_row(self.row)
 
+    height_factor = 0.8
+
     def fixup_row(self, row):
         h = max(f.height for f in row)
         for f in row:
-            f.shift([0, 0.5*(h - f.height)])
+            f.shift([0, self.height_factor*(h - f.height)])
 
     def add_frame(self, frame):
         x_min,x_max, y_min, y_max = frame.calculate_extent()

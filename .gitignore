@@ -17,5 +17,6 @@ __pycache__
 # Build results
 build/
 
-# Output of display_families
+# Output of scripts
 families_graphs/
+nonnuclear_families_graphs/
