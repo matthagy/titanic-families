@@ -25,11 +25,11 @@ def main():
     for c in families:
         if len(c.nodes) == 1:
             continue
-        if not any(n.a.age == -1 for n in c.nodes):
-            continue
+        #if not any(n.a.age == -1 for n in c.nodes):
+        #    continue
         #if not c.difficult_parent_child:
         #    continue
-        if sum(len(c.nodes) for c in acc) > 40:
+        if sum(len(c.nodes) for c in acc) > MAX_FILE_NODES:
             display_graph(i, acc)
             i += 1
             acc = []
