@@ -186,7 +186,7 @@ class Person(graphlib.Node, DotIDMixin):
 
     @property
     def n_known_extended(self):
-        return len(self.extended)
+        return len(self.extendeds)
 
     def __str__(self):
         return 'p(%s)' % (self.name,)
