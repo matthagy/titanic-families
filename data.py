@@ -25,7 +25,7 @@ attribute_types = dict(
   ticket='string',
   fare='float',
   cabin='string',
-  embarked=('nominal', ('C','S','Q'))
+  embarked=('nominal', ('C','S','Q')),
   )
 
 def process_bool(values, args):
@@ -100,6 +100,9 @@ class TitanicDataSet(object):
         self.columns = columns
         self.is_train = is_train
         self.entry_class = get_entry_class(keys)
+
+    def __reduce__(self):
+        return (self.__class__, (self.keys, self.columns, self.is_train))
 
     def __len__(self):
         return len(self.columns[0])
