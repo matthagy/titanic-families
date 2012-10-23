@@ -89,20 +89,25 @@ MINIMUM_PARENT_AGE_ADVANTAGE = 14
 #--------------------------------------------------------
 
 name_rgx = re.compile(r'''
-([^,]+) # Last Name
-, \s+
-  ([^.]+) \. # Title
-  \s+
-  ([^("]+)? # Main name
+^                 # Explicit start
+       \s*
+  ([^,]+)         # Last Name
+     , \s+
+  ([^.]+) \.      # Title
+       \s+
+  ([^("]+)?       # Main name
+       \s*
   (?:
-    "([^"]+)" # Nick name
+    "([^"]+)"     # Nick name
   )?
-  (?:
-    \( "?
-      ([^)"]+) # Other name
-    "? \)
-  )?
+       \s*
+  (?:             # Other name
+     \(
+        ([^)]+)
+      \)
+   )?
 ''', re.VERBOSE)
+
 
 class ParsedName(object):
 
@@ -113,7 +118,7 @@ class ParsedName(object):
         self.title = title
         self.main = main
         self.nick = nick
-        self.other = other
+        self.other = other.strip('"') if other else None
 
     @classmethod
     def create(cls, name):
@@ -135,15 +140,15 @@ class DotIDMixin(object):
     '''Base class for nodes that are written to dot files
     '''
 
-    dot_id_counter = 0
+    _dot_id_counter = 0
 
     @property
     def dot_id(self):
         try:
             return self._dot_id
         except AttributeError:
-            self.__class__.dot_id_counter += 1
-            self._dot_id = str(self.__class__.dot_id_counter)
+            DotIDMixin._dot_id_counter += 1
+            self._dot_id = str(DotIDMixin._dot_id_counter)
         return self._dot_id
 
 
@@ -207,9 +212,6 @@ class Person(graphlib.Node, DotIDMixin):
 
     def has_edge_to(self, other):
         return any(1 for e in self.edges if e.other(self) == other)
-
-    # used in dot file writing
-    write_elsewhere = False
 
 
 class CommonLastName(graphlib.Node):
@@ -865,6 +867,7 @@ class DotCreator(object):
     def __init__(self, fp):
         self.fp = fp
         self.graph_counter = 0
+        self.written_nodes = set()
 
     def write_components(self, components, individual_digraphs=False, **kwds):
         if not individual_digraphs:
@@ -893,23 +896,69 @@ class DotCreator(object):
 
     def write_nuclear_families(self, c):
         families, extra_nodes, extra_edges = find_nuclear_families(c)
+        for f in families:
+            self.write_family(f)
+        for n in extra_nodes:
+            self.write_common_node(n)
+        for e in extra_edges:
+            self.write_common_edge(e)
+
+    def write_family(self, f):
+        print >>self.fp, '%s [label="%s" shape="circle"]' % (f.dot_id, f.name)
+        for p,label in [(f.mother, 'mother'), (f.father, 'father')]:
+            if p:
+                self.write_common_node(p)
+                print >>self.fp, '%s -> %s [label="%s"]' % (p.dot_id, f.dot_id, label)
+        print >>self.fp, '{rank=same;',
+        for p in f.mother, f.father:
+            if p:
+                print >>self.fp, p.dot_id,
+        print >>self.fp, '}'
+
+        for c in f.children:
+            self.write_common_node(c)
+            print >>self.fp, '%s -> %s [label="child"]' % (f.dot_id, c.dot_id)
+
+        print >>self.fp, '{rank=same;',
+        for c in f.children:
+            print >>self.fp, c.dot_id,
+        print >>self.fp, '}'
 
     def write_common_node(self, n):
-        return self.write_node(n, shape='rectangle',
-                               color={True:'green', False:'red', None:'black'}[n.survived],
-                               label='%s\\ns=%d p=%d c=%d e=%s c=%s\\na=%.1f f=%.1f' % (
-                                   n.a.name, n.a.sibsp, n.a.parch, n.a.pclass, n.a.embarked, n.a.cabin,
-                                   n.a.age, n.a.fare))
+        if n in self.written_nodes:
+            return
+        self.write_node(n,
+                   label=self.get_node_label(n),
+                   color=self.get_node_color(n),
+                   shape=self.get_node_shape(n),
+                   **self.get_extra_node_attributes(n))
+
+    def get_node_label(self, n):
+        return '%s\\ns=%d p=%d c=%d e=%s c=%s\\na=%.1f f=%.1f' % (
+            n.a.name, n.a.sibsp, n.a.parch, n.a.pclass, n.a.embarked, n.a.cabin,
+            n.a.age, n.a.fare)
+
+    def get_node_color(self, n):
+        return {True:'green', False:'red', None:'black'}[n.survived]
+
+    def get_node_shape(self, n):
+        return 'rectangle'
+
+    def get_extra_node_attributes(self, n):
+        return {}
 
     show_extended = True
     def write_common_edge(self, e):
         if not e.definitive_extended or self.show_extended:
             self.write_edge(e, label='/'.join(l for l,v in zip(['spouse','sibling','child','extended'],
                                                                e.possibilities)
-                                              if v))
+                                              if v),
+                            style='solid' if not e.definitive_extended else 'dashed')
 
     def write_node(self, n, **kwds):
+        assert n not in self.written_nodes
         print >>self.fp, '%s [%s]' % (n.dot_id, self.make_attributes(kwds))
+        self.written_nodes.add(n)
 
     def write_edge(self, e, **kwds):
         print >>self.fp, '%s -> %s [%s]' % (e.a.dot_id, e.b.dot_id, self.make_attributes(kwds))
