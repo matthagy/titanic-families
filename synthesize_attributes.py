@@ -18,14 +18,20 @@ def main():
     test = TitanicDataSet.get_test()
     families = construct_family_components(train, test)
     people = [mark_problems(p, f) for f in families for p in f.nodes]
-    synthesize('train', [p for p in people if p.survived is not None])
-    synthesize('test', [p for p in people if p.survived is None])
+    synthesize('train', [p for p in people if p.survived is not None], train)
+    synthesize('test', [p for p in people if p.survived is None], test)
 
 def mark_problems(p, f):
     p.difficult_parent_child = f.difficult_parent_child
     return p
 
-def synthesize(name, people):
+def synthesize(name, people, original_ds):
+    # Correct order or individuals
+    assert len(people) == len(original_ds)
+    name_orders = list(original_ds.name)
+    people = sorted(people, key=lambda p: name_orders.index(p.a.name))
+    assert all(p.a.name == name for p,name in zip(people, original_ds.name))
+
     base_keys = people[0].a._fields
     synthesized_keys, calculates = zip(*synthesized_attributes)
     keys = base_keys + synthesized_keys
