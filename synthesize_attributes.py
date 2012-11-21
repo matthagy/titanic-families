@@ -1,4 +1,4 @@
-'''Scripts to display family trees using dot
+'''Create attributes from family tree data
 '''
 
 import os
